@@ -1,0 +1,40 @@
+SELECT a.category, count(a.category) FROM
+(SELECT first_name,salary,
+ CASE
+	WHEN salary < 100000 THEN 'UNDER PAID'
+	WHEN salary > 100000 AND salary < 160000 THEN 'PAID WELL'
+	WHEN salary > 160000 THEN 'EXECUTIVE'
+	ELSE 'UNPAID'
+ END as category
+FROM employees) a
+GROUP BY a.category
+---
+
+SELECT SUM(CASE WHEN department = 'Sports' THEN 1 ELSE 0 END) total_sports,
+SUM(CASE WHEN department = 'Tools' THEN 1 ELSE 0 END) total_tools,
+SUM(CASE WHEN department = 'Clothing' THEN 1 ELSE 0 END) total_clothing,
+SUM(CASE WHEN department = 'Computers' THEN 1 ELSE 0 END) total_computer
+FROM employees
+---
+
+SELECT COUNT(a.region_1) + COUNT(a.region_2) + COUNT(a.region_3) total_us,
+COUNT(a.region_4) + COUNT(a.region_5) total_asia,
+COUNT(a.region_6) + COUNT(a.region_7) total_canada
+FROM
+(select first_name, (case when region_id = 1 THEN (SELECT country FROM regions WHERE region_id = 1) ELSE NULL END) region_1,
+(case when region_id = 2 THEN (SELECT country FROM regions WHERE region_id = 2) ELSE NULL END) region_2,
+(case when region_id = 3 THEN (SELECT country FROM regions WHERE region_id = 3) ELSE NULL END) region_3,
+(case when region_id = 4 THEN (SELECT country FROM regions WHERE region_id = 4) ELSE NULL END) region_4,
+(case when region_id = 5 THEN (SELECT country FROM regions WHERE region_id = 5) ELSE NULL END) region_5,
+(case when region_id = 6 THEN (SELECT country FROM regions WHERE region_id = 6) ELSE NULL END) region_6,
+(case when region_id = 7 THEN (SELECT country FROM regions WHERE region_id = 7) ELSE NULL END) region_7
+FROM employees) a
+--
+SELECT SUM(CASE WHEN region_id = 1 THEN 1 ELSE 0 END) + 
+SUM(CASE WHEN region_id = 2 THEN 1 ELSE 0 END) + 
+SUM(CASE WHEN region_id = 3 THEN 1 ELSE 0 END) total_US,
+SUM(CASE WHEN region_id = 4 THEN 1 ELSE 0 END) +
+SUM(CASE WHEN region_id = 5 THEN 1 ELSE 0 END) total_asia,
+SUM(CASE WHEN region_id = 6 THEN 1 ELSE 0 END) + 
+SUM(CASE WHEN region_id = 7 THEN 1 ELSE 0 END) total_canada FROM employees
+

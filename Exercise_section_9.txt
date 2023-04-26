@@ -1,0 +1,24 @@
+SELECT first_name, department, COUNT(*) FROM employees
+GROUP BY first_name, department
+HAVING COUNT(*) > 1
+--
+(SELECT first_name, department, 
+(SELECT SUM(salary) FROM employees e2 WHERE e1.department = e2.department) as total_per_depart
+FROM employees e1
+ORDER BY department)
+--
+SELECT first_name, department, 
+SUM(salary) OVER (PARTITION BY department)
+FROM employees
+--
+SELECT * FROM regions
+
+SELECT first_name, department, r.country,
+COUNT(*) OVER(PARTITION BY department),
+COUNT(*) OVER(PARTITION BY e.region_id)
+FROM employees e INNER JOIN regions r ON (e.region_id = r.region_id)
+--
+SELECT first_name, hire_date, salary,
+round(AVG(salary) OVER(ORDER BY hire_date RANGE BETWEEN UNBOUNDED PRECEDING
+				 AND CURRENT ROW)) avg_salary
+FROM employees

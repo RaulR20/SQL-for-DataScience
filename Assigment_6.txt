@@ -1,0 +1,42 @@
+/* USED ASSIGMENT 4 TABLE
+1. Write a query that displays 3 columns. The query should display the fruit and it's total supply along with a category of either 
+LOW, ENOUGH or FULL. Low category means that the total supply of the fruit is less than 20,000. The enough category means that the 
+total supply is between 20,000 and 50,000. If the total supply is greater than 50,000 then that fruit falls in the full category.
+
+2.Taking into consideration the supply column and the cost_per_unit column, you should be able to tabulate the total cost 
+to import fruits by each season. The result will look something like this:
+
+"Winter" "10072.50"
+"Summer" "19623.00"
+"All Year" "22688.00"
+"Spring" "29930.00"
+"Fall" "29035.00"
+
+3.Write a query that would transpose this data so that the seasons become columns and the total cost for each season fills 
+the first row?*/
+SELECT * FROM fruit_imports
+--1
+SELECT name, SUM(supply) total_supply, 
+(CASE 
+	WHEN SUM(supply) < 20000 THEN 'LOW'
+	WHEN SUM(supply) >= 20000 AND SUM(supply) <= 50000 THEN 'ENOUGH' 
+	WHEN SUM (supply) > 50000 THEN 'FULL' 
+END) category
+FROM fruit_imports
+GROUP BY name
+ORDER BY total_supply DESC
+
+--2
+SELECT season, SUM(supply * cost_per_unit) import_value FROM fruit_imports
+GROUP BY season
+ORDER BY import_value DESC
+
+SELECT SUM((CASE WHEN season = 'Winter' THEN import_value END)) Winter,
+SUM((CASE WHEN season = 'Summer' THEN (SELECT import_value WHERE season = 'Summer') END)) Summer,
+SUM((CASE WHEN season = 'All Year' THEN import_value END)) All_Year,
+SUM((CASE WHEN season = 'Spring' THEN (SELECT import_value WHERE season = 'Spring') END)) Spring,
+SUM((CASE WHEN season = 'Fall' THEN (SELECT import_value WHERE season = 'Fall') END)) Fall
+FROM (SELECT season, SUM(supply * cost_per_unit) import_value FROM fruit_imports
+GROUP BY season) a
+
+

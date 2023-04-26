@@ -1,0 +1,49 @@
+/*
+1.Are the tables student_enrollment and professors directly related to each other? Why or why not?
+2.Write a query that shows the student's name, the courses the student is taking and the professors that teach that course.
+3.If you execute the query from the previous answer, you'll notice the student_name and the course_no is being repeated. Why is this happening?
+4.In question 3 you discovered why there is repeating data. How can we eliminate this redundancy? Let's say we only care to see a single professor teaching a course
+and we don't care for all the other professors that teach the particular course. Write a query that will accomplish this so that every record is distinct.
+HINT: Using the DISTINCT keyword will not help. :-)
+5.Why are correlated subqueries slower that non-correlated subqueries and joins?
+6.In the video lectures, we've been discussing the employees table and the departments table. Considering those tables, write a query that returns employees whose 
+salary is above average for their given department.
+7.Write a query that returns ALL of the students as well as any courses they may or may not be taking.*/
+
+-- students, courses, student_enrollment, professors, and teach
+SELECT * FROM students
+SELECT * FROM courses
+SELECT * FROM professors
+SELECT * FROM student_enrollment
+SELECT * FROM teach
+--1
+/* No, because the table professors inform the name and department, and student_enrollment table inform the classes, which is in teach table*/
+--2 
+SELECT student_name, sr.course_no, c.course_title,t.last_name
+ FROM student_enrollment sr
+ INNER JOIN students s ON sr.student_no = s.student_no
+ INNER JOIN courses c ON sr.course_no = c.course_no
+ INNER JOIN teach t ON sr.course_no = t.course_no
+--3
+/*Are repeated because the same course can be teached for one or more professors and one student can enroll for one or more courses, 
+not to mention that exist 2 michael with different curses enrolled*/
+--4
+SELECT * FROM  
+(SELECT student_name, sr.student_no, sr.course_no, c.course_title,t.last_name
+ FROM student_enrollment sr
+ INNER JOIN students s ON sr.student_no = s.student_no
+ INNER JOIN courses c ON sr.course_no = c.course_no
+ LEFT JOIN (SELECT DISTINCT ON (course_no) last_name, course_no FROM teach) t ON sr.course_no = t.course_no) a
+ ORDER BY student_name;
+--5
+/*Is slower because for every row in the external correlated query needs to execute the internal correlated querry,
+so if a correlation is made with huge tables, will equally during huge time.
+*/
+--6
+SELECT * FROM employees e1
+WHERE salary > (SELECT round(avg(salary)) FROM employees e2	
+				WHERE e1.department = e2.department)
+--7
+SELECT s.student_name, sr.course_no, c.course_title FROM students s
+FULL OUTER JOIN student_enrollment sr ON s.student_no = sr.student_no
+FULL OUTER JOIN courses c ON sr.course_no = c.course_no

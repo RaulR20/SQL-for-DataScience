@@ -1,0 +1,53 @@
+SELECT * FROM departments
+SELECT * FROM employees
+SELECT * FROM regions
+--
+SELECT first_name, email, division
+FROM employees, departments
+WHERE employees.department = departments.department
+AND email IS NOT NULL
+-- 
+SELECT country, count(*)
+FROM employees e, regions r
+WHERE e.region_id = r.region_id
+GROUP BY country
+--
+SELECT distinct e.department emplo_department, d.department depart_department FROM employees e
+LEFT JOIN departments d ON e.department = d.department
+WHERE d.department IS NULL
+--
+SELECT department, count(*) FROM employees
+GROUP BY department
+UNION ALL
+SELECT 'TOTAL', COUNT(*) FROM employees
+--
+SELECT * FROM employees
+SELECT * FROM departments
+SELECT * FROM regions
+--
+SELECT first_name, department, hire_date, country
+FROM employees e INNER JOIN regions r ON e.region_id = r.region_id
+WHERE hire_date = (select MAX(hire_date) FROM employees)
+OR hire_date = (SELECT MIN(hire_date) FROM employees)
+ORDER BY hire_date DESC
+-- ANOTHER OPTION 
+SELECT first_name, department, hire_date, country
+FROM employees e INNER JOIN regions r ON e.region_id = r.region_id
+WHERE hire_date = (select MAX(hire_date) FROM employees)
+UNION ALL
+SELECT first_name, department, hire_date, country
+FROM employees e INNER JOIN regions r ON e.region_id = r.region_id
+WHERE hire_date = (select MIN(hire_date) FROM employees)
+--
+SELECT first_name, salary, hire_date,
+(SELECT SUM(salary) FROM employees e2
+ WHERE e2.hire_date BETWEEN e.hire_date - 90 AND e.hire_date) as spending_pattern
+FROM employees e 
+ORDER BY hire_date;
+--
+SELECT first_name, salary, hire_date,
+(SELECT SUM(salary) FROM employees e2
+ WHERE e2.hire_date BETWEEN e.hire_date - 90 AND e.hire_date) as spending_pattern
+FROM employees e 
+ORDER BY hire_date;
+--

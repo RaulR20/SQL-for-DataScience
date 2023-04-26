@@ -1,0 +1,16 @@
+Section_7 assigments
+
+SELECT * FROM employees
+
+SELECT first_name, department, salary, 
+(CASE 
+     WHEN salary = (SELECT max(salary) FROM employees e1	
+      	WHERE e1.department = e.department) THEN 'HIGHEST SALARY' 
+     WHEN salary = (SELECT min(salary) FROM employees e2
+ 		WHERE e2.department = e.department) THEN 'LOWEST SALARY' END) as category_salary
+FROM employees e
+WHERE salary = (SELECT max(salary) FROM employees e1 	
+		        WHERE e1.department = e.department)
+OR salary = (SELECT min(salary) FROM employees e2
+			 WHERE e2.department = e.department)
+ORDER BY department
